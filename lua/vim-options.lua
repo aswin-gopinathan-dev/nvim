@@ -20,6 +20,18 @@ vim.opt.sessionoptions:remove("sesdir")
 vim.o.equalalways = false
 --vim.opt.signcolumn = "auto:2"
 
+vim.o.autocomplete = false
+vim.o.completeopt = "menu,popup,noselect"
+-- Completion menu
+vim.o.pumborder = "rounded"
+vim.o.pumheight = 12
+vim.o.pumwidth = 30
+vim.o.pummaxwidth = 60
+vim.o.pumblend = 5
+-- Show: completion | type | extra info
+vim.o.completeitemalign = "abbr,kind,menu"
+
+
 if vim.fn.has("unnamedplus") == 1 then
   vim.opt.clipboard = "unnamedplus"
 else

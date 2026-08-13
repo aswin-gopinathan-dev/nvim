@@ -3,12 +3,10 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
         "williamboman/mason.nvim",
-        "hrsh7th/cmp-nvim-lsp",
         { "antosha417/nvim-lsp-file-operations", config = true },
         { "folke/neodev.nvim",                   opts = {} },
     },
     config = function()
-        local capabilities = require("cmp_nvim_lsp").default_capabilities()
         local navic = require("nvim-navic")
 
         -- 1. Global Diagnostic Configuration (Replaces manual sign loops)
@@ -31,11 +29,28 @@ return {
             group = vim.api.nvim_create_augroup("UserLspConfig", {}),
             callback = function(ev)
                 require("vim-keymaps-debug").MapLspKeys(ev)
-				if (vim.g.restoring_session ~= nil and vim.g.restoring_session) or vim.api.nvim_get_current_buf() ~= ev.buf then
+								
+                local client = vim.lsp.get_client_by_id(ev.data.client_id)
+                if not client then
+                    return
+                end
+
+                if client:supports_method("textDocument/completion") then
+                    local chars = {}
+                    for i = 32, 126 do
+                        table.insert(chars, string.char(i))
+                    end
+
+                    client.server_capabilities.completionProvider.triggerCharacters = chars
+
+                    vim.lsp.completion.enable(true, client.id, ev.buf, {
+                        autotrigger = true,
+                    })
+                end
+
+                if (vim.g.restoring_session ~= nil and vim.g.restoring_session) or vim.api.nvim_get_current_buf() ~= ev.buf then
 					return
 				end
-				
-                local client = vim.lsp.get_client_by_id(ev.data.client_id)
 
                 -- Attach Navic globally if server supports symbols
                 if client.server_capabilities.documentSymbolProvider then
@@ -46,10 +61,6 @@ return {
                 -- require("vim-keymaps-debug").MapLspKeys(ev)
             end,
         })
-
-        -- 3. Native LSP Configurations
-        -- Define global defaults for all servers
-        vim.lsp.config('*', { capabilities = capabilities })
 
         -- Enable specific servers
         -- Note: 'ruff_lsp' is deprecated; Nvim 0.11 uses 'ruff' natively
@@ -78,14 +89,5 @@ return {
         -- Activate all servers
         vim.lsp.enable(servers)
 
-        -- 4. Completion UI Tweaks (Keep if you prefer nvim-cmp)
-        local ok, cmp = pcall(require, "cmp")
-        if ok then
-            cmp.setup({
-                window = {
-                    documentation = cmp.config.disable,
-                },
-            })
-        end
     end
 }

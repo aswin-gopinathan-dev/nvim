@@ -261,42 +261,42 @@ end)
 vim.keymap.set("v", "p", '"_dP`[v`]=')
 
 local function reindent_last_change_keep_cursor()
-  -- Skip special buffers (neo-tree, telescope prompt, terminals, etc.)
-  if vim.bo.buftype ~= "" then
-    return
-  end
+    if vim.bo.buftype ~= "" then
+        return
+    end
 
-  -- Get last changed region marks
-  local start_pos = vim.fn.getpos("'[")  -- {bufnr, row, col, off}
-  local end_pos   = vim.fn.getpos("']")
+    -- Finish current insert/change so '[ and '] are updated
+    vim.cmd("stopinsert")
 
-  local srow = start_pos[2]
-  local erow = end_pos[2]
+    local start_pos = vim.fn.getpos("'[")
+    local end_pos = vim.fn.getpos("']")
 
-  -- If marks are not valid (no recent change/paste), do nothing
-  if srow == 0 or erow == 0 then
-    return
-  end
+    local srow = start_pos[2]
+    local erow = end_pos[2]
 
-  -- Save cursor so we don't "jump" to the marks
-  local win = vim.api.nvim_get_current_win()
-  local cur = vim.api.nvim_win_get_cursor(win)
+    if srow == 0 or erow == 0 then
+        vim.cmd("startinsert")
+        return
+    end
 
-  -- Reindent from `[ to `] without polluting jumplist
-  vim.cmd("silent! keepjumps normal! `[=']")
+    local win = vim.api.nvim_get_current_win()
+    local cur = vim.api.nvim_win_get_cursor(win)
 
-  -- Restore cursor
-  pcall(vim.api.nvim_win_set_cursor, win, cur)
+    vim.cmd("silent! keepjumps normal! `[=']")
+
+    pcall(vim.api.nvim_win_set_cursor, win, cur)
+
+    vim.cmd("startinsert")
 end
 
 -- Insert mode: Ctrl+Space → auto-indent last changed/pasted block
-vim.keymap.set("i", "<C-Space>", reindent_last_change_keep_cursor, {
+vim.keymap.set("i", "<C-v>", '<C-R><C-P>+', {
   silent = true,
-  desc = "Auto-indent last change/paste (insert mode)",
+  desc = "Paste clipboard with indentation",
 })
 
 -- Fallback: some terminals send <C-@> for Ctrl+Space
-vim.keymap.set("i", "<C-@>", reindent_last_change_keep_cursor, {
+vim.keymap.set("i", "<C-Space>", reindent_last_change_keep_cursor, {
   silent = true,
   desc = "Auto-indent last change/paste (insert mode, C-@ fallback)",
 })
