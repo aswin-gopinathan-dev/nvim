@@ -64,7 +64,7 @@ return {
 
         -- Enable specific servers
         -- Note: 'ruff_lsp' is deprecated; Nvim 0.11 uses 'ruff' natively
-        local servers = { "lua_ls", "clangd", "pyright", "ruff", "qmlls" }
+        local servers = { "lua_ls", "clangd", "pyright", "ruff", "qmlls", "rust_analyzer" }
 
         -- Define specific settings for each server to avoid "overlap"
         vim.lsp.config("pyright", {

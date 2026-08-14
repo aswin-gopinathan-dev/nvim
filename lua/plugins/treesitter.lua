@@ -12,6 +12,7 @@ return {
             "lua",
             "python",
             "qmljs",
+            "rust"
         })
     end, 
 }
