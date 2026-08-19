@@ -34,10 +34,6 @@ return {
       show_help = "<f1>",
     },
 	open_multiple_tabs = false,
-    highlight_groups = {
-      hovered_buffer = "",
-      hovered_buffer_in_same_directory = "",
-    },
     hooks = {
       -- Force Neovim to reset theme state when closing Yazi
       yazi_closed_user_command = function()
