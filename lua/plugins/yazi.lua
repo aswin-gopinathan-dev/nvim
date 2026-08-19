@@ -35,8 +35,16 @@ return {
     },
 	open_multiple_tabs = false,
     highlight_groups = {
-      hovered_buffer = nil,
-      hovered_buffer_in_same_directory = nil,
+      hovered_buffer = "",
+      hovered_buffer_in_same_directory = "",
+    },
+    hooks = {
+      -- Force Neovim to reset theme state when closing Yazi
+      yazi_closed_user_command = function()
+        if vim.g.colors_name then
+          vim.cmd("colorscheme " .. vim.g.colors_name)
+        end
+      end,
     },
   },
   -- 👇 if you use `open_for_directories=true`, this is recommended
