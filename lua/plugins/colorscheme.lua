@@ -162,4 +162,6 @@ return {
     { "mhartington/oceanic-next" },
     { 'uloco/bluloco.nvim' },
     { 'ayu-theme/ayu-vim' },
+    { "savq/melange-nvim" },
+    { "folke/tokyonight.nvim" }
 }

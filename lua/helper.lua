@@ -767,11 +767,18 @@ local themes = {
   "blue-mood",
   "OceanicNext",
   "bluloco-dark",
-  "ayu"
+  "ayu",
+  "melange",
+  "tokyonight-night",
+  "tokyonight-storm",
+  "tokyonight-day",
+  "tokyonight-moon"
 }
 
 function M.select_colorscheme()
-  vim.ui.select(themes, {
+  local sorted_themes = vim.deepcopy(themes)
+  table.sort(sorted_themes, function(a, b) return a:lower() < b:lower() end )
+  vim.ui.select(sorted_themes, {
     prompt = "Select colorscheme",
   }, function(choice)
     if not choice then
@@ -782,28 +789,9 @@ function M.select_colorscheme()
 end
 
 function M.toggle_themestyle()
-    -- 1. Determine the target style based on current background
-    local target_is_dark = (vim.o.background == "light")
+    vim.o.background = vim.o.background == "dark" and "light" or "dark" 
 
-    -- 2. Clear old highlight definitions
-    vim.cmd("hi clear")
-    if vim.fn.exists("syntax_on") then
-        vim.cmd("syntax reset")
-    end
-
-    -- 3. Apply the specific themes
-    if target_is_dark then
-        -- Set background first so plugins know what's happening
-        vim.o.background = "dark"
-        -- Load Nightfox (standard dark)
-        vim.cmd("colorscheme nightfox")
-    else
-        vim.o.background = "light"
-        -- Load Newpaper's specific light command
-        vim.cmd("NewpaperLight")
-    end
-
-    -- 4. Schedule the Bufferline refresh
+    -- Schedule the Bufferline refresh
     vim.schedule(function()
         local status_ok, bufferline = pcall(require, "bufferline")
         if status_ok then
