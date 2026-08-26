@@ -539,6 +539,9 @@ function M.build_app()
     )
 
     launch_app(cmd)
+  elseif active_target == "Rust3D" then
+      local cmd = "cargo build"
+      launch_app(cmd)
   end
 end
 
@@ -570,6 +573,11 @@ function M.run_app2()
 
     launch_app(string.format('"%s"', program))
     return
+  end
+
+  if active_target == "Rust3D" then
+    local cmd = "cargo run"
+    launch_app(cmd)
   end
 end
 

@@ -1,4 +1,4 @@
-active_target = "3D"
+active_target = "Rust3D"
 
 python = "sagacity/Scripts/python"
 codelldb = "packages/codelldb/extension/adapter/codelldb"
@@ -8,6 +8,16 @@ type = "cpp"
 name = "3D Renderer"
 build_dir = "."
 program = "app"
+cwd = "."
+args = []
+stopOnEntry = false
+runInTerminal = true
+
+[Rust3D]
+type = "rs"
+name = "Rust 3D Renderer"
+build_dir = "."
+program = "Rust3DRenderer"
 cwd = "."
 args = []
 stopOnEntry = false
