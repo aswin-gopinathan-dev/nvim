@@ -134,7 +134,7 @@ return {
         codex = function()
           return require("codecompanion.adapters").extend("codex", {
             defaults = {
-              auth_method = "chatgpt", -- uses ChatGPT login, not API key
+              auth_method = "chat-gpt", -- uses ChatGPT login, not API key
               session_config_options = {
                 -- keep model unset first; choose from CodeCompanion debug/options if needed
                 -- model = "gpt-5.4",
