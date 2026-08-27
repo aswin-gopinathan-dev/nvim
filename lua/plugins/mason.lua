@@ -1,5 +1,13 @@
 return {
     "williamboman/mason.nvim",
+
+    cmd = {
+        "Mason",
+        "MasonInstall",
+        "MasonUninstall",
+        "MasonUpdate",
+        "MasonLog",
+    },
     dependencies = {
         "williamboman/mason-lspconfig.nvim",
     },

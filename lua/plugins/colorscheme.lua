@@ -1,147 +1,104 @@
 return {
 	{
-		"EdenEast/nightfox.nvim",
-		--lazy=true,
+        "savq/melange-nvim",
+        priority = 1000,
 
-		dependencies = {
-			"nvim-lualine/lualine.nvim",
-			"nvim-tree/nvim-web-devicons",
-			"catppuccin/nvim",
-			"rktjmp/lush.nvim",
-		},
-		config = function()
-			vim.cmd.colorscheme "dayfox"
+        dependencies = {
+            "nvim-lualine/lualine.nvim",
+            "nvim-tree/nvim-web-devicons",
+        },
 
-			--require("catppuccin").setup(flavour="latte",)
+        config = function()
+            -- Default colorscheme
+            vim.cmd.colorscheme("melange")
 
-			-- setup must be called before loading
-			--vim.cmd.colorscheme "catppuccin-latte"
-			--require("yorumi").setup({variant="mist"})
-			vim.g.yorumi_variant = "mist"
-            vim.g.ayucolor = "light"
+            -- Status line: line/column information
+            local function line_info()
+                local line = vim.fn.line(".")
+                local total = vim.fn.line("$")
+                local col = vim.fn.col(".")
 
+                return string.format(
+                    "Ln %d/%d  Col %d",
+                    line,
+                    total,
+                    col
+                )
+            end
 
-			require("catppuccin").setup({
-				flavour = "macchiato", -- latte, frappe, macchiato, mocha
+            -- Lualine
+            require("lualine").setup({
+                options = {
+                    theme = "auto",
+                    globalstatus = true,
+                },
 
-				transparent_background = false, -- disables setting the background color.	
-				show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
-				term_colors = false, -- sets terminal colors (e.g. `g:terminal_color_0`)
-				no_italic = true,  -- Force no italic
-				no_bold = false,   -- Force no bold
-				no_underline = false, -- Force no underline
-				styles = {         -- Handles the styles of general hi groups (see `:h highlight-args`):
-					comments = { "italic" }, -- Change the style of comments
-					conditionals = { "italic" },
-					loops = {},
-					functions = {},
-					keywords = {},
-					strings = {},
-					variables = {},
-					numbers = {},
-					booleans = {},
-					properties = {},
-					types = {},
-					operators = {},
-					-- miscs = {}, -- Uncomment to turn off hard-coded styles
-				},
-				color_overrides = {},
-				custom_highlights = function(colors)
-					return
-					{
-						LineNr = { fg = colors.sky },
-						CursorLineNr = { fg = colors.lavender },
-						CursorLine = { bg = colors.surface0 },
+                sections = {
+                    lualine_a = {
+                        "mode",
+                    },
 
-						Cursor = { fg = colors.blue },
-					}
-				end,
-				default_integrations = true,
-				integrations = {
-					cmp = true,
-					gitsigns = true,
-					nvimtree = true,
-					treesitter = true,
-					notify = false,
-					mini = {
-						enabled = true,
-						indentscope_color = "",
-					},
-					-- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
-				},
-			})
-			
-			require("newpaper").setup({ style = "auto"})
-	
+                    lualine_b = {
+                        "branch",
+                        "diff",
+                        "diagnostics",
+                    },
 
-			-- setup must be called before loading
-			--vim.cmd.colorscheme "newpaper"  --"terafox"
-			
-			vim.cmd.colorscheme "PaperColor"
-			vim.api.nvim_set_hl(0, "TabLineFill", {
-				fg = "#303030",
-				bg = "#eeeeee",
-			  })
-			
-			
-			local function line_info()
-				local line = vim.fn.line(".")
-				local total = vim.fn.line("$")
-				local col = vim.fn.col(".")
-				return string.format("Ln %d/%d  Col %d", line, total, col)
-			end
+                    lualine_c = {
+                        {
+                            function()
+                                return " 󰋇"
+                            end,
+                            separator = "",
+                        },
 
+                        {
+                            "filename",
+                            path = 1,
+                        },
+                    },
 
-			require('lualine').setup {
-				options = {
-					--theme = "terafox",
-					theme = "newpaper",
-					globalstatus = true,
-				},
-				sections = {
-					lualine_a = { 'mode' },
-					lualine_b = { 'branch', 'diff', 'diagnostics' },
-					lualine_c = { {
-						function()
-							return " 󰋇"
-						end,
-						separator = '',
-					},
-						{ 'filename', path = 1 } },
-					--lualine_x = {'encoding', 'fileformat', 'filetype'},
-					lualine_x = {},
-					lualine_y = { 'progress' },
-					lualine_z = { line_info }, --{'location'}
-				},
-			}
+                    lualine_x = {},
 
+                    lualine_y = {
+                        "progress",
+                    },
 
-			local navic = require("nvim-navic")
+                    lualine_z = {
+                        line_info,
+                    },
+                },
+            })
 
-			local function get_winbar_string(bufnr)
-				local ft = vim.bo[bufnr].filetype
+            -- Winbar / Navic
+            local navic = require("nvim-navic")
 
-				-- no winbar in Neo-tree
-				if ft == "neo-tree" then
-					return ""
-				end
+            local function get_winbar_string(bufnr)
+                local ft = vim.bo[bufnr].filetype
 
-				-- your normal winbar everywhere else
-				if navic.is_available() then
-					return "  %{%v:lua.require'nvim-navic'.get_location()%}"
-				end
+                -- No winbar in Neo-tree
+                if ft == "neo-tree" then
+                    return ""
+                end
 
-				return ""
-			end
+                if navic.is_available() then
+                    return "  %{%v:lua.require'nvim-navic'.get_location()%}"
+                end
 
+                return ""
+            end
 
-			vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
-				callback = function(args)
-					vim.wo.winbar = get_winbar_string(args.buf)
-				end,
-			})
-		end,
-	},
+            vim.api.nvim_create_autocmd(
+                { "BufWinEnter", "WinEnter" },
+                {
+                    callback = function(args)
+                        vim.wo.winbar =
+                            get_winbar_string(args.buf)
+                    end,
+                }
+            )
+        end,
+    },
 
 	-- 🔹 Other themes (installed but NOT auto-applied)
 	{ "sainnhe/gruvbox-material", lazy = true },

@@ -463,11 +463,12 @@ function M.preview_svg()
   open_with_system(outfile, false)
 end
 
-local terminal = require("toggleterm.terminal")
-local Terminal = terminal.Terminal
+
 local RUN_TERM_COUNT = 99
 
 local function get_run_term()
+  local terminal = require("toggleterm.terminal")
+  local Terminal = terminal.Terminal
   local term = terminal.get(RUN_TERM_COUNT)
   if not term then
     term = Terminal:new({

@@ -1,6 +1,9 @@
 return {
   "NvChad/nvim-colorizer.lua",
-  event = "BufReadPre",
+  ft = {
+      "qml",
+      "lua",
+  },
   config = function()
     require("colorizer").setup({
       qml = {
@@ -10,7 +13,6 @@ return {
         css = true,
       },
       lua = { names = false },
-      "*",
     }, {
       mode = "background", -- background color like VS Code
     })
