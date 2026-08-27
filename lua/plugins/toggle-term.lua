@@ -6,12 +6,6 @@ return {
       "TermExec",
   },
 
-  keys = {
-      [[<c-\>]],
-      "<leader>tt",
-      "<leader>tf",
-  },
-
   config = function()
     local platform = require("platform")
 
