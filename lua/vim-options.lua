@@ -21,7 +21,7 @@ vim.o.equalalways = false
 --vim.opt.signcolumn = "auto:2"
 
 vim.o.autocomplete = false
-vim.o.completeopt = "menu,popup,noselect"
+vim.o.completeopt = "menu,menuone,popup,noselect"
 -- Completion menu
 vim.o.pumborder = "rounded"
 vim.o.pumheight = 12
