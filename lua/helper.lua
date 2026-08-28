@@ -423,10 +423,40 @@ function M.open_terminal_floating()
   vim.cmd(string.format("ToggleTerm dir=%s direction=float", shellescape(cwd)))
 end
 
+local BOTTOM_TERM_ID = 97
 function M.open_terminal_horizontal()
-  close_quickfix()
-  local cwd = vim.fn.getcwd()
-  vim.cmd(string.format("ToggleTerm dir=%s direction=horizontal", shellescape(cwd)))
+    close_quickfix()
+
+    local terminal = require("toggleterm.terminal")
+    local Terminal = terminal.Terminal
+
+    local term = terminal.get(BOTTOM_TERM_ID)
+
+    if not term then
+        term = Terminal:new({
+            id = BOTTOM_TERM_ID,
+            direction = "horizontal",
+            close_on_exit = false,
+            hidden = false,
+        })
+    end
+
+    if term:is_open() and term.direction ~= "horizontal" then
+        term:close()
+    end
+
+    if term:is_open() then
+        term:focus()
+    else
+        term.dir = vim.fn.getcwd()
+        term:open(nil, "horizontal")
+    end
+
+    vim.schedule(function()
+        vim.cmd("startinsert")
+    end)
+
+    return term
 end
 
 function M.preview_svg()

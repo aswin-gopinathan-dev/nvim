@@ -87,14 +87,15 @@ keymap.set("n", "<leader>tf", function()
         vim.cmd("startinsert")
     end)
 end, { desc = "Open Floating Terminal" })
+
 keymap.set("n", "<leader>tt", function()
     require("helper").open_terminal_horizontal()
     vim.schedule(function()
         vim.cmd("startinsert")
     end)
 end, { desc = "Open Horizontal Terminal" })
---keymap.set("t", "<leader>tt", "<Cmd>ToggleTerm<CR>")
 
+--[[
 keymap.set({ "n", "t" }, "<leader>tt", function()
   for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
     local buf = vim.api.nvim_win_get_buf(win)
@@ -106,6 +107,7 @@ keymap.set({ "n", "t" }, "<leader>tt", function()
 
   vim.cmd("ToggleTerm")
 end, { desc = "Open or focus terminal" })
+]]
 
 keymap.set({ "n", "t" }, "<leader>ty", function()
     require("helper").open_terminal_side()
