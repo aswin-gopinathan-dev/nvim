@@ -481,19 +481,99 @@ local function get_run_term()
   return term
 end
 
+
+local SIDE_TERM_ID = 98
+local side_terminal = nil
+local side_terminal_restore_neotree = false
+
+local function is_neotree_open()
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        local buf = vim.api.nvim_win_get_buf(win)
+
+        if vim.bo[buf].filetype == "neo-tree" then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function get_side_terminal()
+    if side_terminal then
+        return side_terminal
+    end
+
+    local terminal = require("toggleterm.terminal")
+    local Terminal = terminal.Terminal
+
+    side_terminal = terminal.get(SIDE_TERM_ID)
+
+    if not side_terminal then
+        side_terminal = Terminal:new({
+            id = SIDE_TERM_ID,
+            direction = "vertical",
+            close_on_exit = false,
+            hidden = false,
+
+            on_close = function()
+                if side_terminal_restore_neotree then
+                    vim.schedule(function()
+                        pcall(vim.cmd, "Neotree show left")
+                    end)
+                end
+
+                side_terminal_restore_neotree = false
+            end,
+        })
+    end
+
+    return side_terminal
+end
+
+function M.open_terminal_side()
+    close_quickfix()
+
+    local term = get_side_terminal()
+
+    if term:is_open() then
+        term:focus()
+        vim.cmd("startinsert")
+        return term
+    end
+
+    side_terminal_restore_neotree = is_neotree_open()
+
+    pcall(vim.cmd, "Neotree close")
+
+    M.close_terminal()
+
+    term.dir = vim.fn.getcwd()
+    term:open()
+
+    vim.schedule(function()
+        if term.window and vim.api.nvim_win_is_valid(term.window) then
+            local terminal_width = math.floor(vim.o.columns * 0.40)
+
+            vim.api.nvim_win_set_width(
+                term.window,
+                terminal_width
+            )
+
+            vim.api.nvim_set_current_win(term.window)
+            vim.cmd("startinsert")
+        end
+    end)
+
+    return term
+end
+
 local function launch_app(pgm)
-  local term = get_run_term()
+    local term = M.open_terminal_side()
 
-  if not term:is_open() then
-    term:open(9)
-  else
-    term:focus()
-  end
-
-  vim.defer_fn(function()
-    term:send(terminal_clear_command(), true)
-    term:send(pgm, true)
-  end, 50)
+    vim.defer_fn(function()
+        term:send(terminal_clear_command(), true)
+        term:send(pgm, true)
+    end, 50)
 end
 
 function M.run_app()

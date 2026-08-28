@@ -107,6 +107,10 @@ keymap.set({ "n", "t" }, "<leader>tt", function()
   vim.cmd("ToggleTerm")
 end, { desc = "Open or focus terminal" })
 
+keymap.set({ "n", "t" }, "<leader>ty", function()
+    require("helper").open_terminal_side()
+end, { desc = "Open Right-side Terminal" })
+
 keymap.set("n", "<leader>ts", function() require("helper").preview_svg() end, { desc = 'Preview SVG' })
 --keymap.set("n", "<F8>", function() require("helper").preview_svg() end, { desc = 'Preview SVG' })
 keymap.set("n", "<leader>tr", function() require("helper").run_app() end, { desc = "Run Application" })
