@@ -1,21 +1,25 @@
 local keymap = vim.keymap
 local helper = require("helper")
 
+local function load_dap()
+  require("lazy").load({ plugins = { "nvim-dap" } })
+end
+
 -- Debugger
 -- <leader>d	--> Begin Debug Functionalities
 -- ============================================
-keymap.set('n', '<F5>', function() require('neo-tree').close_all(); require('dap').continue() end)
-keymap.set('n', '<F10>', function() require('dap').step_over() end)
-keymap.set('n', '<F11>', function() require('dap').step_into() end)
-keymap.set('n', '<leader><F10>', function() require('dap').step_out() end)
-keymap.set('n', '<F9>', function() require('dap').toggle_breakpoint() end)
-keymap.set('n', '<leader><F9>', function() require('dap').set_breakpoint() end)
+keymap.set('n', '<F5>', function() load_dap(); require('neo-tree').close_all(); require('dap').continue() end)
+keymap.set('n', '<F10>', function() load_dap(); require('dap').step_over() end)
+keymap.set('n', '<F11>', function() load_dap(); require('dap').step_into() end)
+keymap.set('n', '<leader><F10>', function() load_dap(); require('dap').step_out() end)
+keymap.set('n', '<F9>', function() load_dap(); require('dap').toggle_breakpoint() end)
+keymap.set('n', '<leader><F9>', function() load_dap(); require('dap').set_breakpoint() end)
 keymap.set('n', '<leader><F5>', helper.close_debugger)
 keymap.set('v', '<F12>', helper.add_debug_watch)
 keymap.set("n", "<leader>dl", helper.select_debug_layout)
-keymap.set('n', '<F12>', function() require('dapui').elements.watches.add(vim.fn.expand('<cword>')) end)
-keymap.set('n', '<leader>ds', function() require("dapui").float_element("stacks", {width=70,height=20,enter=true}) end)
-keymap.set('n', '<leader>db', function() require("dapui").float_element("breakpoints", {width=70,height=20,enter=true}) end)
+keymap.set('n', '<F12>', function() load_dap(); require('dapui').elements.watches.add(vim.fn.expand('<cword>')) end)
+keymap.set('n', '<leader>ds', function() load_dap(); require("dapui").float_element("stacks", {width=70,height=20,enter=true}) end)
+keymap.set('n', '<leader>db', function() load_dap(); require("dapui").float_element("breakpoints", {width=70,height=20,enter=true}) end)
 -- ==========================================
 -- <leader>d	--> End Debug Functionalities
 

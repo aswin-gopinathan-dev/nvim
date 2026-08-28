@@ -1,19 +1,7 @@
 return {
 	"mfussenegger/nvim-dap",
 
-    keys = {
-        "<F5>",
-        "<F9>",
-        "<F10>",
-        "<F11>",
-        "<F12>",
-        "<leader><F5>",
-        "<leader><F9>",
-        "<leader><F10>",
-        "<leader>dl",
-        "<leader>ds",
-        "<leader>db",
-    },
+    lazy = true, 
 
 	dependencies = {
 		"rcarriga/nvim-dap-ui",
