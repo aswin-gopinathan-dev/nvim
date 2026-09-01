@@ -13,6 +13,16 @@ args = []
 stopOnEntry = false
 runInTerminal = true
 
+[Rust3D]
+type = "rs"
+name = "Rust 3D Renderer"
+build_dir = "."
+program = "Rust3DRenderer.exe"
+cwd = "."
+args = []
+stopOnEntry = false
+runInTerminal = true
+
 [bias_tests]
 type = "cpp"
 name = "Bias USB Driver Tests"

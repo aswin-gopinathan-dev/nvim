@@ -147,6 +147,7 @@ keymap.set("n", "<leader>ee", function()
   end
 end, { desc = "Open/focus Neo-tree" })
 
+--[[
 keymap.set("n", "<leader>ev", function()
   local path = vim.fn.expand("%:p:h")
   vim.fn.setreg("+", path)
@@ -155,6 +156,34 @@ keymap.set("n", "<leader>ev", function()
     detach = true,
   })
 end, { desc = "Open folder in Explorer" })
+]]
+
+vim.keymap.set('n', '<leader>ev', function()
+    local file_path = vim.api.nvim_buf_get_name(0)
+    if file_path == '' then
+        vim.notify("Buffer has no file path", vim.log.levels.WARN)
+        return
+    end
+
+    local sys = vim.loop.os_uname().sysname
+
+    if sys == "Windows_NT" then
+        local win_path = file_path:gsub('/', '\\')
+        local cmd = string.format('explorer.exe /select,"%s"', win_path)
+        vim.fn.jobstart(cmd, { detach = true }) 
+    else
+        vim.fn.jobstart({
+            "dbus-send", "--session", "--print-reply",
+            "--dest=org.freedesktop.FileManager1",
+            "/org/freedesktop/FileManager1",
+            "org.freedesktop.FileManager1.ShowItems",
+            "array:string:file://" .. file_path, "string:"
+        }, { detach = true })
+    end 
+end, { desc = "Reveal file in OS File Explorer" })
+
+
+
 --require("helper").preview_file() end, { desc = "File Preview" })
 -- =============================================
 -- <leader>e	--> End Explorer Functionalities
