@@ -1171,6 +1171,9 @@ SRC = $(wildcard *.cpp)
 build: 
 	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET)
 
+cc:
+	bear -- make build
+
 run: 
 	./$(TARGET)
 
