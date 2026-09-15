@@ -1139,4 +1139,50 @@ function M.get_files_list()
   }):find()
 end
 
+function M.create_project()
+    local name = vim.fn.input("Project name: ")
+
+    if name == "" then
+        return
+    end
+
+    vim.fn.mkdir(name, "p")
+
+    local main = io.open(name .. "/main.cpp", "w")
+    main:write([[
+#include <iostream>
+
+int main()
+{
+    std::cout << "Hello, World!\n";
+    return 0;
+}
+    ]])
+    main:close()
+
+    local makefile = io.open(name .. "/Makefile", "w")
+    makefile:write([[
+CXX = g++
+CXXFLAGS = -std=c++20 -Wall -Wextra
+
+TARGET = main
+SRC = $(wildcard *.cpp)
+
+build: 
+	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET)
+
+run: 
+	./$(TARGET)
+
+clean: 
+	rm -f $(TARGET)
+
+.PHONY: clean
+    ]])
+    makefile:close()
+
+    vim.cmd("cd " .. vim.fn.fnameescape(name))
+    vim.cmd("edit main.cpp")
+end
+
 return M
