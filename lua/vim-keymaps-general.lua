@@ -237,7 +237,10 @@ keymap.set("n", "<leader>m]", "<Plug>(Marks-next-bookmark0)", {silent = true})
 keymap.set("n", "<leader>m[", "<Plug>(Marks-prev-bookmark0)", {silent = true})
 --keymap.set("n", "<leader>ml", "<cmd>BookmarksListAll<CR>")
 keymap.set("n", "<leader>ml", "<cmd>Telescope marks<CR>", { desc = "Telescope Marks" })
-keymap.set("n", "<leader>mp", function() require("helper").create_project() end, { desc = "Create C++ project" })
+
+
+keymap.set("n", "<leader>pc", function() require("helper").create_project() end, { desc = "Create C++ project" })
+keymap.set("n", "<leader>pf", function() require("helper").create_class() end, { desc = "Create C++ class" })
 
 -- Common Windows shortcut
 keymap.set({ "n", "i" }, "<C-f>", function() require("helper").find_word() end, { silent = true })

@@ -1140,52 +1140,177 @@ function M.get_files_list()
 end
 
 function M.create_project()
-    local name = vim.fn.input("Project name: ")
+    vim.ui.input({ prompt = "Project name: " }, function(project_name)
+        if not project_name or project_name == "" then
+            return
+        end
 
-    if name == "" then
-        return
-    end
+        local root = vim.fn.getcwd()
+        local project_dir = path_join(root, project_name)
 
-    vim.fn.mkdir(name, "p")
+        local src_dir = path_join(project_dir, "src")
+        local inc_dir = path_join(project_dir, "inc")
+        local build_dir = path_join(project_dir, "build")
 
-    local main = io.open(name .. "/main.cpp", "w")
-    main:write([[
+        -- Create project directories
+        vim.fn.mkdir(src_dir, "p")
+        vim.fn.mkdir(inc_dir, "p")
+        vim.fn.mkdir(build_dir, "p")
+
+        -- Create main.cpp inside src/
+        local main_cpp = path_join(src_dir, "main.cpp")
+
+        local main_file = io.open(main_cpp, "w")
+        if main_file then
+            main_file:write([[
 #include <iostream>
 
 int main()
 {
-    std::cout << "Hello, World!\n";
-    return 0;
+	std::cout << "Hello, World!" << std::endl;
+	return 0;
 }
-    ]])
-    main:close()
+]])
+            main_file:close()
+        end
 
-    local makefile = io.open(name .. "/Makefile", "w")
-    makefile:write([[
-CXX = g++
-CXXFLAGS = -std=c++20 -Wall -Wextra
+        -- Create Makefile in project root
+        local makefile_path = path_join(project_dir, "Makefile")
 
-TARGET = main
-SRC = $(wildcard *.cpp)
+        local makefile = io.open(makefile_path, "w")
+        if makefile then
+            makefile:write([[
+CXX := g++
+CXXFLAGS := -std=c++20 -Wall -Wextra -Iinc
 
-build: 
-	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET)
+SRC_DIR := src
+BUILD_DIR := build
+
+SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
+OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SOURCES))
+
+TARGET := $(BUILD_DIR)/main
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CXX) $(OBJECTS) -o $(TARGET)
+
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 cc:
-	bear -- make build
+	bear -- make build		
 
-run: 
+run: $(TARGET)
 	./$(TARGET)
 
-clean: 
-	rm -f $(TARGET)
+clean:
+	rm -rf $(BUILD_DIR)/*
 
-.PHONY: clean
-    ]])
-    makefile:close()
+.PHONY: all clean
+]])
+            makefile:close()
+        end
 
-    vim.cmd("cd " .. vim.fn.fnameescape(name))
-    vim.cmd("edit main.cpp")
+        -- Switch Neovim to the new project
+        vim.cmd("cd " .. vim.fn.fnameescape(project_dir))
+
+        -- Open main.cpp
+        vim.cmd("edit " .. vim.fn.fnameescape(main_cpp))
+
+        vim.notify(
+            "Created C++ project: " .. project_name,
+            vim.log.levels.INFO
+        )
+    end)
+end
+
+
+function M.create_class()
+	vim.ui.input({ prompt = "Class name: " }, function(class_name)
+		if not class_name or class_name == "" then
+			return
+		end
+
+		local root = vim.fn.getcwd()
+		local src_dir = path_join(root, "src")
+		local inc_dir = path_join(root, "inc")
+
+		if vim.fn.isdirectory(src_dir) == 0 or vim.fn.isdirectory(inc_dir) == 0 then
+			vim.notify(
+				"src/ or inc/ directory not found",
+				vim.log.levels.ERROR
+			)
+			return
+		end
+
+		local cpp_path = path_join(src_dir, class_name .. ".cpp")
+		local header_path = path_join(inc_dir, class_name .. ".h")
+
+		-- Don't accidentally overwrite an existing class
+		if vim.fn.filereadable(cpp_path) == 1 or
+		   vim.fn.filereadable(header_path) == 1 then
+			vim.notify(
+				"Class already exists: " .. class_name,
+				vim.log.levels.ERROR
+			)
+			return
+		end
+
+		-- Header
+		local header = io.open(header_path, "w")
+		if header then
+			header:write(string.format([[
+#pragma once
+
+class %s
+{
+public:
+	%s();
+	~%s();
+
+private:
+	
+};
+	]], class_name, class_name, class_name))
+
+			header:close()
+		end
+
+		-- Source
+		local source = io.open(cpp_path, "w")
+		if source then
+			source:write(string.format([[
+#include "../inc/%s.h"
+
+%s::%s()
+{
+}
+
+%s::~%s()
+{
+}
+	]],
+				class_name,
+				class_name,
+				class_name,
+				class_name,
+				class_name
+			))
+
+			source:close()
+		end
+
+		vim.cmd("edit " .. vim.fn.fnameescape(header_path))
+		vim.cmd("badd " .. vim.fn.fnameescape(cpp_path))
+
+		vim.notify(
+			"Created class: " .. class_name,
+			vim.log.levels.INFO
+		)
+	end)
 end
 
 return M
