@@ -1313,4 +1313,32 @@ private:
 	end)
 end
 
+function M.create_project_config()
+	local root = vim.fn.getcwd()
+	local path = root .. "/project.toml"
+
+	-- Do not overwrite an existing project.toml
+	if vim.fn.filereadable(path) == 1 then
+		vim.notify("project.toml already exists", vim.log.levels.INFO)
+		vim.cmd("edit " .. vim.fn.fnameescape(path))
+		return
+	end
+
+	local config = {
+		'type = "cpp"',
+		'name = "Project"',
+		'build_dir = "./build"',
+		'program = "main"',
+		'cwd = "."',
+		'args = []',
+		'stopOnEntry = false',
+		'runInTerminal = true',
+	}
+
+	vim.fn.writefile(config, path)
+
+	vim.notify("Created project.toml", vim.log.levels.INFO)
+	vim.cmd("edit " .. vim.fn.fnameescape(path))
+end
+
 return M

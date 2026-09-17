@@ -241,6 +241,8 @@ keymap.set("n", "<leader>ml", "<cmd>Telescope marks<CR>", { desc = "Telescope Ma
 
 keymap.set("n", "<leader>pc", function() require("helper").create_project() end, { desc = "Create C++ project" })
 keymap.set("n", "<leader>pf", function() require("helper").create_class() end, { desc = "Create C++ class" })
+keymap.set("n", "<leader>pi", function() require("helper").create_project_config() end, { desc = "Initialize project config" })
+
 
 -- Common Windows shortcut
 keymap.set({ "n", "i" }, "<C-f>", function() require("helper").find_word() end, { silent = true })
