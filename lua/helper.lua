@@ -638,22 +638,17 @@ function M.build_app()
   vim.cmd("stopinsert")
   
   local ok, platform = pcall(require, "platform")
-  local cfg, active_target = platform.get_active_target()
-  local target = cfg[active_target]
-  
-  if active_target == "3D" then
-    local build_path = platform.resolve(target.build_dir or ".")
+  local project = platform.read_project()
+  if not project then return end
 
-    local cmd = string.format(
-      'cd "%s" && make',
-      build_path
-    )
-
-    launch_app(cmd)
-  elseif active_target == "Rust3D" then
-      local cmd = "cargo build"
-      launch_app(cmd)
-  end
+  if project.type == "cpp" then
+      local build_path = platform.resolve(project.cwd or ".")
+      launch_app(string.format('cd "%s" && make', build_path))
+  elseif project.type == "rs" then
+      launch_app("cargo build")
+  elseif project.type == "python" then
+      vim.notify("Python project has no build step.", vim.log.levels.INFO)
+  end 
 end
 
 function M.run_app2()
@@ -662,33 +657,24 @@ function M.run_app2()
   
   
   local ok, platform = pcall(require, "platform")
-  local cfg, active_target = platform.get_active_target()
-  local target = cfg[active_target]
+  local project = platform.read_project()
+  if not project then return end
 
-  if active_target == "sagacity_desktop" then
+  if project.type == "python" then
     local python_cmd = get_python_cmd()
-    if not python_cmd then
-      notify_missing_tool("python / python3")
-      return
+    launch_app(string.format('%s "%s"', python_cmd, platform.resolve(project.program)))
+  elseif project.type == "cpp" then
+    local exe = platform.resolve(
+      platform.join(project.build_dir or ".", project.program)
+    )
+    local cmd = string.format('"%s"', exe)
+    if project.command and project.command ~= "" then
+        cmd = cmd .. " && " .. project.command
     end
 
-    local entrypoint = path_join(vim.fn.getcwd(), "entrypoint.py")
-    launch_app(string.format('%s "%s"', python_cmd, entrypoint))
-  end
-  
-  if active_target == "3D" then
-    local program = target.program
-    if target.build_dir and target.build_dir ~= "" then
-      program = path_join(target.build_dir, target.program)
-    end
-
-    launch_app(string.format('"%s"', program))
-    return
-  end
-
-  if active_target == "Rust3D" then
-    local cmd = "cargo run"
     launch_app(cmd)
+  elseif project.type == "rs" then
+    launch_app("cargo run")
   end
 end
 
@@ -1333,6 +1319,7 @@ function M.create_project_config()
 		'args = []',
 		'stopOnEntry = false',
 		'runInTerminal = true',
+        'command=""'
 	}
 
 	vim.fn.writefile(config, path)

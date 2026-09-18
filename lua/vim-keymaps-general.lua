@@ -239,9 +239,9 @@ keymap.set("n", "<leader>m[", "<Plug>(Marks-prev-bookmark0)", {silent = true})
 keymap.set("n", "<leader>ml", "<cmd>Telescope marks<CR>", { desc = "Telescope Marks" })
 
 
-keymap.set("n", "<leader>pc", function() require("helper").create_project() end, { desc = "Create C++ project" })
-keymap.set("n", "<leader>pf", function() require("helper").create_class() end, { desc = "Create C++ class" })
-keymap.set("n", "<leader>pi", function() require("helper").create_project_config() end, { desc = "Initialize project config" })
+keymap.set("n", "<leader>mp", function() require("helper").create_project() end, { desc = "Create C++ project" })
+keymap.set("n", "<leader>mf", function() require("helper").create_class() end, { desc = "Create C++ class" })
+keymap.set("n", "<leader>mi", function() require("helper").create_project_config() end, { desc = "Initialize project config" })
 
 
 -- Common Windows shortcut

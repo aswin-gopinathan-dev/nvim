@@ -192,8 +192,44 @@ function M.read_config()
   return data
 end
 
+local function find_project_root()
+return vim.fs.root(0, {
+  "project.toml",
+  "entrypoint.py",
+  "Cargo.toml",
+  ".git",
+}) or vim.fn.getcwd()
+end
+
+function M.get_project_file()
+return M.join(find_project_root(), "project.toml")
+end
+
+function M.read_project()
+local file = M.get_project_file()
+
+if not M.exists(file) then
+  vim.notify("project.toml not found in project root", vim.log.levels.ERROR)
+  return nil
+end
+
+local ok, toml = pcall(require, "toml")
+if not ok then
+  vim.notify("toml.nvim not available", vim.log.levels.ERROR)
+  return nil
+end
+
+local ok_parse, data = pcall(toml.parse_file, file)
+if not ok_parse then
+  vim.notify("Failed to parse project.toml", vim.log.levels.ERROR)
+  return nil
+end
+
+return data
+end
+
 function M.get_active_target()
-  local cfg = M.read_config()
+  local cfg = M.read_project()
   if not cfg then
     return nil
   end
